@@ -6,6 +6,34 @@ app.set('view engine','ejs');
 app.use(express.static("views"));
 app.use(express.static(__dirname));
 app.use(express.urlencoded());
+
+//mongodb connection
+const mongoose = require('mongoose');
+const { name } = require('ejs');
+mongoose.connect("mongodb://127.0.0.1:27017/userdb", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+
+.then(() => {
+  console.log("Connected to the database");
+})
+.catch((err) => {
+  console.error("Error connecting to the database:", err);
+});
+
+//schema
+
+const sch = {
+  name:String,
+  email:String,
+  pass:Number
+}
+const monmodel = mongoose.model("users",sch);
+
+
+
+
 const oneDay = 1000 * 60 * 60 * 24;
 
 app.use(function(req, res, next) { 
@@ -37,28 +65,23 @@ app.get('/index',(req,res)=>{
   }
 });
 
+app.get('/register',isAuthenticated,(req,res)=>{
+  res.render("register");
+})
+
 
 // Middleware to check if the user is authenticated
 function isAuthenticated(req, res, next) {
   if (req.session.user) {
+    
     res.redirect('/index'); // User is authenticated, proceed to the next route handler
   } else {
     return next(); // User is not authenticated, redirect to login page
   }
 }
 
-/*app.get('/',(req,res)=>{
-  session = req.session;
-  if(session.userid){
-    res.redirect('index');
-  }
-  else{
-    res.render('/');
-  }
-});
-*/
 
-
+//login
 app.post('/login',(req,res)=>{
  console.log(req.body)
   const{username,password}= req.body;
@@ -71,8 +94,35 @@ app.post('/login',(req,res)=>{
   }
 })
 
-app.get('/logout',(req,res)=>{
 
+//signup
+app.post('/signup',isAuthenticated, async (req, res) => {
+  try {
+    const data = new monmodel({
+      "name": req.body.name,
+      "email": req.body.email,
+      "pass": req.body.password
+    });
+    const {name}=data;
+    req.session.user=name;
+    const savedData = await data.save();
+
+    if (savedData) {
+      console.log("Record inserted successfully");
+      res.redirect("/index");
+    } else {
+      console.log("Failed to insert record");
+      res.redirect("/register");
+    }
+  } catch (error) {
+    console.error("Error during signup:", error);
+    res.redirect("/register");
+  }
+});
+
+
+//logout
+app.get('/logout',(req,res)=>{
   req.session.destroy((err)=>{
     if(err){
       console.error('Error destroyng session',err);
@@ -85,15 +135,6 @@ app.get('/logout',(req,res)=>{
  
 });
 
-// app.get("/logout", (req, res) => {
-//   req.session.destroy((err) => {
-//     if (err) {
-//       return console.log(err);
-//     }
-//     res.send("logged out");
-//     console.log("logged out");
-//   });
-// });
 
 
 app.listen(5000, () => {
