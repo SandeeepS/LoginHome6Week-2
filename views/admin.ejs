@@ -47,11 +47,10 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle second-text fw-bold" href="#" id="navbarDropdown"
                                 role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user me-2"></i>John Doe
+                                <i class="fa-solid fa-gear"></i> Settings
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="#">Profile</a></li>
-                                <li><a class="dropdown-item" href="#">Settings</a></li>
+                                
                                 <li><a class="dropdown-item" href="/logoutAd">Logout</a></li>
                             </ul>
                         </li>
@@ -60,12 +59,34 @@
                 </nav>
                 <div class="container-fluid px-4">
                 <div class="row my-5">
+
+                         <!-- Add a search form -->
+                            <form action="/admin" method="get">
+                                <input type="text" name="search" placeholder="Search users by name" />
+                                <button type="submit">Search</button>
+                            </form>
+                            
+                            <!-- Display search results -->
+                            <% if (searchQuery) { %>
+                                <!-- Display search results -->
+                                <h2>Search Results</h2>
+                                <ul>
+                                    <% for (const user of users) { %>
+                                    <li><%= user.name %></li>
+                                    <% } %>
+                                </ul>
+                                <% } %>
+                                
+  
                     <h2>User Details</h2>
                             <table  class="table bg-white rounded shadow-sm  table-hover">
                                 <thead>
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
+                                    <th>Create</th>
+                                    <th>Update</th>
+                                    <th>Delete</th>
                                     <!-- Add other columns if needed -->
                                 </tr>
                                 </thead>
@@ -74,6 +95,15 @@
                                     <tr>
                                     <td><%= user.name %></td>
                                     <td><%= user.email %></td>
+                                    <td>
+                                        <a href="/createUser"><i class="fa-solid fa-plus"></i></a>
+                                    </td>
+                                    <td>
+                                        <a href=""><i class="fa-solid fa-pen-to-square"></i></a>
+                                    </td>
+                                    <td>
+                                        <a href=""><i class="fa-solid fa-trash"></i></a>
+                                    </td>
                                     <!-- Add other columns if needed -->
                                     </tr>
                                 <% } %>

@@ -82,14 +82,6 @@ function isAuthenticated(req, res, next) {
   }
 }
 
-// Middleware to check if the admin is authenticated
-function isAuthenticatedAdmin(req, res, next) {
-  if ( req.session.user2) {
-    res.redirect('/admin'); // admin is authenticated, proceed to the next route handler
-  } else {
-    return next(); // admin is not authenticated, redirect to adminlogin page
-  }
-}
 
 
 //login
@@ -173,7 +165,7 @@ app.get('/adminlogin',(req,res)=>{
 });
 
 
-app.get('/admin',async (req, res) => {
+/*app.get('/admin',async (req, res) => {
 
   if(!req.session.user2){
     res.redirect('/adminlogin');
@@ -196,7 +188,28 @@ app.get('/admin',async (req, res) => {
 
 
   
+});*/
+
+
+//searching user
+app.get('/admin', async (req, res) => {
+  try {
+    if (!req.session.user2) {
+      res.redirect('/adminlogin');
+    } else {
+      const searchQuery = req.query.search || ''; // Get the search query from the query parameter
+
+      const users = await monmodel.find({ name: { $regex: searchQuery, $options: 'i' } }).exec();
+      const admins = await monmodelA.find().exec();
+
+      res.render('admin', { users, admins, searchQuery });
+    }
+  } catch (error) {
+    console.error("Error fetching user and admin details:", error);
+    res.redirect('/adminlogin');
+  }
 });
+
 
 
 app.post('/adlogin', async (req, res) => {
@@ -240,6 +253,32 @@ app.get('/logoutAd',(req,res)=>{
    
   });
  
+});
+
+
+/*--------creating user from admin page---------*/
+
+
+// Route to render the form for creating new data
+app.get('/admin/createUserData', (req, res) => {
+  res.render('createUser'); // Render a form for creating new data
+});
+
+//route for creating user from admin page
+app.post('/admin/create', async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    console.log(name);
+
+    // Create a new document in the database
+    const newData = new monmodel({ name, email });
+    await newData.save();
+
+    res.redirect('/admin/createUserData'); // Redirect back to the admin page after creating data
+  } catch (error) {
+    console.error("Error creating data:", error);
+    res.redirect('/admin');
+  }
 });
 
 app.listen(5000, () => {
