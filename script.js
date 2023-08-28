@@ -31,7 +31,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/userdb", {
 const sch = {
   name:String,
   email:String,
-  pass:Number
+  password:Number
 }
 
 const monmodel = mongoose.model("users",sch);
@@ -94,7 +94,7 @@ app.post('/login', async (req, res) => {
   try {
     // Query the database to find a user with the given username and password
     
-    const user = await monmodel.findOne({ name: username, pass: password }).exec();
+    const user = await monmodel.findOne({ name: username, password: password }).exec();
 
     if (user) {
       // User exists in the database, set the session and redirect to index page
@@ -119,7 +119,7 @@ app.post('/signup',isAuthenticated, async (req, res) => {
     const data = new monmodel({
       "name": req.body.name,
       "email": req.body.email,
-      "pass": req.body.password
+      "password": req.body.password
     });
     const {name}=data;
     req.session.user=name;
@@ -166,30 +166,6 @@ app.get('/adminlogin',(req,res)=>{
 });
 
 
-/*app.get('/admin',async (req, res) => {
-
-  if(!req.session.user2){
-    res.redirect('/adminlogin');
-  }else{
-    try {
-    
-      // Query the database to get all user records
-      const users = await monmodel.find().exec();
-      
-      // Query the database to get all admin records
-      const admins = await monmodelA.find().exec();
-  
-      res.render('admin', { users, admins });
-    } catch (error) {
-      console.error("Error fetching user and admin details:", error);
-      res.redirect('/adminlogin');
-    }
-
-  }
-
-
-  
-});*/
 
 
 //searching user
@@ -221,7 +197,7 @@ app.post('/adlogin', async (req, res) => {
   try {
     // Query the database to find a user with the given username and password
     
-    const user2 = await monmodelA.findOne({ name: adUsername, pass: adPassword }).exec();
+    const user2 = await monmodelA.findOne({ name: adUsername, password: adPassword }).exec();
     console.log("User found in the database:", user2);
 
     if (user2) {
@@ -268,11 +244,12 @@ app.get('/admin/create', (req, res) => {
 //route for creating user from admin page
 app.post('/newUser', async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email,password } = req.body;
     console.log(name);
-
+    console.log(password);
+    console.log(email);
     // Create a new document in the database
-    const newData = new monmodel({ name, email });
+    const newData = new monmodel({ name, email ,password });
     await newData.save();
 
     res.redirect('/admin'); // Redirect back to the admin page after creating data
@@ -304,10 +281,10 @@ app.get('/updateUserData/:id', async (req, res) => {
 app.post('/newUser/:id', async (req, res) => {
   try {
     const dataId = req.params.id;
-    const { name, email } = req.body;
+    const { name, email,password } = req.body;
 
     // Update the data in the database
-    await monmodel.findByIdAndUpdate(dataId, { name, email }).exec();
+    await monmodel.findByIdAndUpdate(dataId, { name, email,password }).exec();
 
     res.redirect('/admin'); // Redirect back to the admin page after updating data
   } catch (error) {
@@ -315,6 +292,25 @@ app.post('/newUser/:id', async (req, res) => {
     res.redirect('/admin');
   }
 });
+
+
+/*-----Delete the user data------ */
+
+// Route to handle the deletion of data
+app.get('/deleteUserData/:id', async (req, res) => {
+  try {
+    const dataId = req.params.id;
+
+    // Delete the data from the database
+    await monmodel.findByIdAndDelete(dataId).exec();
+
+    res.redirect('/admin'); // Redirect back to the admin page after deleting data
+  } catch (error) {
+    console.error("Error deleting data:", error);
+    res.redirect('/admin');
+  }
+});
+
 
 
 app.listen(5000, () => {
