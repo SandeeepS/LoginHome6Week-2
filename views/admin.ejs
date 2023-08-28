@@ -84,7 +84,6 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Create</th>
                                     <th>Update</th>
                                     <th>Delete</th>
                                     <!-- Add other columns if needed -->
@@ -95,12 +94,11 @@
                                     <tr>
                                     <td><%= user.name %></td>
                                     <td><%= user.email %></td>
+                                 
                                     <td>
-                                        <a href="/createUser"><i class="fa-solid fa-plus"></i></a>
-                                    </td>
-                                    <td>
-                                        <a href=""><i class="fa-solid fa-pen-to-square"></i></a>
-                                    </td>
+                                        <a href="/updateUserData/<%= user._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
+                                      </td>
+                                      
                                     <td>
                                         <a href=""><i class="fa-solid fa-trash"></i></a>
                                     </td>
@@ -108,7 +106,10 @@
                                     </tr>
                                 <% } %>
                                 </tbody>
-                            </table>                
+                            </table>     
+                            <h2>
+                                Create user <a href="/admin/create"><i class="fa-solid fa-plus"></i></a>
+                            </h2>           
                
 
           </div>

@@ -3,6 +3,7 @@ const session = require('express-session');
 const app = express();
 const bodyParser = require('body-parser');
 const flash = require('connect-flash');
+
 app.set('view engine','ejs');
 app.use(express.static("views"));
 app.use(express.static(__dirname));
@@ -260,12 +261,12 @@ app.get('/logoutAd',(req,res)=>{
 
 
 // Route to render the form for creating new data
-app.get('/admin/createUserData', (req, res) => {
+app.get('/admin/create', (req, res) => {
   res.render('createUser'); // Render a form for creating new data
 });
 
 //route for creating user from admin page
-app.post('/admin/create', async (req, res) => {
+app.post('/newUser', async (req, res) => {
   try {
     const { name, email } = req.body;
     console.log(name);
@@ -274,12 +275,47 @@ app.post('/admin/create', async (req, res) => {
     const newData = new monmodel({ name, email });
     await newData.save();
 
-    res.redirect('/admin/createUserData'); // Redirect back to the admin page after creating data
+    res.redirect('/admin'); // Redirect back to the admin page after creating data
   } catch (error) {
     console.error("Error creating data:", error);
     res.redirect('/admin');
   }
 });
+
+
+/*----------- update the user data-------*/
+
+app.get('/updateUserData/:id', async (req, res) => {
+  try {
+    const dataId = req.params.id;
+    
+
+    // Fetch the data to be updated from the database
+    const dataToUpdate = await monmodel.findById(dataId).exec();
+
+    res.render('updateUser', { dataToUpdate }); // Render a form for updating data
+  } catch (error) {
+    console.error("Error rendering update form:", error);
+    res.redirect('/admin');
+  }
+});
+
+// Route to handle the submission of updated data
+app.post('/newUser/:id', async (req, res) => {
+  try {
+    const dataId = req.params.id;
+    const { name, email } = req.body;
+
+    // Update the data in the database
+    await monmodel.findByIdAndUpdate(dataId, { name, email }).exec();
+
+    res.redirect('/admin'); // Redirect back to the admin page after updating data
+  } catch (error) {
+    console.error("Error updating data:", error);
+    res.redirect('/admin');
+  }
+});
+
 
 app.listen(5000, () => {
   console.log('Server running on http://localhost:5000');
