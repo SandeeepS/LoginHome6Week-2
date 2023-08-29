@@ -11,14 +11,14 @@
 <section>
     <div class="row">
     <div class="col-12">
-        <form action="/signup" method="post" class="form-signup">
+        <form action="/signup" method="post"  onsubmit="return validateForm()"  class="form-signup" >
             <h2>Sign Up</h2>
             
             <div class="form-group">
-               <input type="text" class="form-control" name="name" placeholder="Name">
+               <input type="text" class="form-control" name="name" id="username" placeholder="Name">
             </div>
             <div class="form-group">
-                <input type="email" class="form-control" name="email" placeholder="Email">
+                <input type="email" class="form-control" name="email" id="password" placeholder="Email">
             </div>
             <div class="form-group">
                 <input type="password" class="form-control" name="password" placeholder="password">
@@ -29,5 +29,24 @@
     </div>
     </div>
 </section>
+
+
+<script>
+    
+    function validateForm(){
+      // Get the user name and password from the form
+      const usernamefrom = document.getElementById('username').value;
+      const passwordfrom = document.getElementById('password').value;
+    
+      if(usernamefrom ===""||usernamefrom ===null || passwordfrom===""){
+          event.preventDefault();
+          alert("please fill the form");
+          return false;
+      }else{
+          return true;
+      }
+    
+    }
+      </script>
 </body>
 </html>

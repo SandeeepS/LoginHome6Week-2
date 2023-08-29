@@ -1,13 +1,13 @@
 const express = require('express');
 const session = require('express-session');
 const app = express();
-const bodyParser = require('body-parser');
+app.use(express.urlencoded({ extended: true }))
 const flash = require('connect-flash');
 
 app.set('view engine','ejs');
 app.use(express.static("views"));
 app.use(express.static(__dirname));
-app.use(express.urlencoded());
+
 app.use(flash());
 
 
@@ -101,9 +101,7 @@ app.post('/login', async (req, res) => {
       req.session.user = user.name; // Store the user's name in the session
       res.redirect('/index');
     } else {
-      // User does not exist or the password is incorrect, redirect to login page with a flash message
-      req.flash('error', 'Invalid username or password. Please sign up if you are a new user.');
-      res.redirect('/');
+          res.redirect('/');
     }
   } catch (error) {
     console.error("Error during login:", error);
